@@ -18,22 +18,14 @@ class FormatPluginTest {
     @Test
     public void 'format task is created'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
 
         assertTrue(project.tasks.format instanceof FormatTask)
     }
 
-    @Test(expected = GradleException)
-    public void 'java plugin is needed'() {
-        Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'format'
-    }
-
     @Test
     public void 'load properties settings'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
         FormatTask task = project.tasks.format as FormatTask
 
@@ -50,7 +42,6 @@ class FormatPluginTest {
     @Test
     public void 'load XML settings'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
         FormatTask task = project.tasks.format as FormatTask
 
@@ -67,7 +58,6 @@ class FormatPluginTest {
     @Test(expected = GradleException)
     public void 'load unknown settings'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
         FormatTask task = project.tasks.format as FormatTask
 
@@ -79,7 +69,6 @@ class FormatPluginTest {
     @Test
     public void 'load null settings'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
         FormatTask task = project.tasks.format as FormatTask
 
@@ -94,7 +83,6 @@ class FormatPluginTest {
     @Test
     public void 'sort imports'() {
         Project project = ProjectBuilder.builder().build()
-        project.apply plugin: 'java'
         project.apply plugin: 'format'
         FormatTask task = project.tasks.format as FormatTask
 
@@ -105,6 +93,22 @@ class FormatPluginTest {
         task.format()
 
         assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeSortedImports.java").text
+    }
+
+    @Test
+    public void 'sort imports and format code'() {
+        Project project = ProjectBuilder.builder().build()
+        project.apply plugin: 'format'
+        FormatTask task = project.tasks.format as FormatTask
+
+        def sourceFile = classpathResourceToFile("JavaUnsortedImportsAndCodeUnformatted.java")
+        task.importsOrder = ["java", "javax", "org", "\\#com"]
+        task.configurationFile = classpathResourceToFile("formatter.properties")
+        task.files = project.files(sourceFile)
+
+        task.format()
+
+        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeSortedImportsCodeFormatted.java").text
     }
 
     private File classpathResourceToFile(String filename) {
