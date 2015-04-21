@@ -23,7 +23,9 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.hibernate:hibernate-tools:4.0.0-CR1'
+
+    compile 'org.eclipse.tycho:org.eclipse.jdt.core:3.10.0.v20140604-1726'
+    compile 'org.eclipse:text:3.3.0-v20070606-0010'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
