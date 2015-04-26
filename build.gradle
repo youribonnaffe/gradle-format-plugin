@@ -23,9 +23,9 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-
     compile 'org.eclipse.tycho:org.eclipse.jdt.core:3.10.0.v20140604-1726'
-    compile 'org.eclipse:text:3.3.0-v20070606-0010'
+    compile 'org.eclipse.text:org.eclipse.text:3.5.101'
+
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -49,4 +49,8 @@ pluginBundle {
             displayName = 'Gradle Format plugin'
         }
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4-rc-1'
 }
