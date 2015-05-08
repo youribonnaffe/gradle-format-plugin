@@ -42,6 +42,7 @@ public class JavaFormatter {
             if (edit != null) {
                 edit.apply(doc);
             } else {
+                System.out.println("====> could not format " + file);
                 return false; // most likely syntax errror
             }
 

@@ -122,13 +122,39 @@ class FormatPluginTest {
     public void 'format Java 8 code'() {
         FormatTask task = project.tasks.format as FormatTask
 
-        def sourceFile = classpathResourceToFile("JavaCodeUnformatted.java")
+        def sourceFile = classpathResourceToFile("JavaCodeUnformatted_Java8.java")
         task.configurationFile = classpathResourceToFile("formatter_java_8.properties")
         task.files = project.files(sourceFile)
 
         task.format()
 
-        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeFormatted.java").text
+        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeFormatted_Java8.java").text
+    }
+
+    @Test
+    public void 'format Java 7 code'() {
+        FormatTask task = project.tasks.format as FormatTask
+
+        def sourceFile = classpathResourceToFile("JavaCodeUnformatted_Java7.java")
+        task.configurationFile = classpathResourceToFile("formatter_java_8.properties")
+        task.files = project.files(sourceFile)
+
+        task.format()
+
+        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeFormatted_Java7.java").text
+    }
+
+    @Test
+    public void 'format enum'() {
+        FormatTask task = project.tasks.format as FormatTask
+
+        def sourceFile = classpathResourceToFile("EnumUnformatted.java")
+        task.configurationFile = classpathResourceToFile("formatter.properties")
+        task.files = project.files(sourceFile)
+
+        task.format()
+
+        assert sourceFile.text == getClass().getResourceAsStream("/Enum.java").text
     }
 
     private File classpathResourceToFile(String filename) {
