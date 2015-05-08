@@ -24,7 +24,6 @@ public class ImportSorterAdapter {
     }
 
     public String sortImports(String document) {
-        println "sorting with $importsOrder"
         // parse file
         Scanner scanner = new Scanner(document);
         int firstImportLine = 0;
@@ -61,15 +60,15 @@ public class ImportSorterAdapter {
         Scanner scanner;
         boolean importsAlreadyAppended = false;
         scanner = new Scanner(document);
-        int curentLine = 0;
+        int currentLine = 0;
         final StringBuilder sb = new StringBuilder();
         while (scanner.hasNext()) {
-            curentLine++;
+            currentLine++;
             String next = scanner.nextLine();
             if (next == null) {
                 break;
             }
-            if (curentLine >= firstImportLine && curentLine <= lastImportLine) {
+            if (currentLine >= firstImportLine && currentLine <= lastImportLine) {
                 if (!importsAlreadyAppended) {
                     for (String string : strings) {
                         sb.append(string);
