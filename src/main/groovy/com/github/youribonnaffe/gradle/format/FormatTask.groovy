@@ -15,14 +15,14 @@ public class FormatTask extends DefaultTask {
 
     @TaskAction
     public void doTask() {
-        List<Callable<Void>> tasks = new ArrayList<>();
+        List<Callable<Void>> tasks = new ArrayList<>()
 
         String operationWeDo = ''
         final ImportSorterAdapter importOrder = FormatInputLoad.importOrder(model.importOrder)
         final JavaFormatter format = FormatInputLoad.format(model.formatOptions)
         if (importOrder != null) operationWeDo += 'importOrder '
         if (format != null) operationWeDo += 'format '
-        if (format == null && importOrder == null) return;
+        if (format == null && importOrder == null) return
         final String operation = operationWeDo
         final LinkedHashMap<String, Exception> errors = new LinkedHashMap<>()
 
@@ -37,30 +37,30 @@ public class FormatTask extends DefaultTask {
                     try {
                         if (file.exists() && !file.isDirectory() && file.canRead() && file.canWrite()) {
                             if (format != null) {
-                                format.formatFile(file);
+                                format.formatFile(file)
                             }
                             if (importOrder != null) {
-                                importOrder.updateImports(file);
+                                importOrder.updateImports(file)
                             }
                             logger.debug(operation + file.absolutePath)
                         } else {
-                            error(new Exception("could not R/W file"));
+                            error(new Exception("could not read or write the file ${file.absolutePath}"))
                         }
                     } catch (Exception e) {
-                        error(e);
+                        error(e)
                     }
                     return null;
                 }
             });
         }
         try {
-            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            exec.invokeAll(tasks);
+            ExecutorService exec = Executors.newFixedThreadPool(Runtime.runtime.availableProcessors())
+            exec.invokeAll(tasks)
         } catch (InterruptedException e) {
-            throw new RuntimeException("could not finish executing format threads", e);
+            throw new RuntimeException('could not finish executing format threads', e)
         } finally{
             if(!errors.isEmpty()){
-                throw new GradleException("FAILED " + operationWeDo + errors.toString());
+                throw new GradleException("FAILED ${operationWeDo} due to ${errors.toString()}")
             }
         }
     }

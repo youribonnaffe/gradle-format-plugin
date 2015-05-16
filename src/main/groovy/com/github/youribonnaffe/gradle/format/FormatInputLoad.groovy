@@ -21,18 +21,18 @@ class FormatInputLoad {
         ImportSorterAdapter importConfig = null
         if (importOrderSource != null) {
             if (importOrderSource instanceof ArrayList) {
-                importConfig = new ImportSorterAdapter(importOrderSource as ArrayList<String>);
+                importConfig = new ImportSorterAdapter(importOrderSource as ArrayList<String>)
             } else {
                 if (importOrderSource instanceof String) {
-                    importOrderSource = new File((String) importOrderSource);
+                    importOrderSource = new File((String) importOrderSource)
                 }
-                if (!(importOrderSource instanceof File)) throw new GradleException("import order must be either a file, not specified, or a string path");
-                File f = (File) importOrderSource;
-                checkValidReadFile(f);
+                if (!(importOrderSource instanceof File)) throw new GradleException("import order must be either a file, not specified, or a string path")
+                File f = (File) importOrderSource
+                checkValidReadFile(f)
                 try {
-                    importConfig = ImportSorterAdapter.createFromFile(f);
+                    importConfig = ImportSorterAdapter.createFromFile(f)
                 } catch (IOException e) {
-                    throw new GradleException("could not parse " + f.getAbsolutePath());
+                    throw new GradleException("could not parse ${f.absolutePath}")
                 }
             }
         }
@@ -41,115 +41,115 @@ class FormatInputLoad {
     }
 
     static JavaFormatter format(Object formatSource) {
-        Properties formatProperties = null;
+        Properties formatProperties = null
         if (formatSource != null) {
             if (formatSource instanceof String) {
-                formatSource = new File((String) formatSource);
+                formatSource = new File((String) formatSource)
             }
             if (!(formatSource instanceof File)) {
-                throw new GradleException("format must be either a file, not specified, or a string path");
+                throw new GradleException("format must be either a file, not specified, or a string path")
             }
-            File f = (File) formatSource;
-            checkValidReadFile(f);
-            if (f.getName().endsWith(".properties")) {
-                formatProperties = readPropertyFormat(f);
-            } else if (f.getName().endsWith(".xml")) {
-                formatProperties = readXmlFormat(f);
+            File f = (File) formatSource
+            checkValidReadFile(f)
+            if (f.name.endsWith(".properties")) {
+                formatProperties = readPropertyFormat(f)
+            } else if (f.name.endsWith(".xml")) {
+                formatProperties = readXmlFormat(f)
             } else {
-                throw new GradleException("Unsupported format file " + f.getAbsolutePath());
+                throw new GradleException("Unsupported format file ${f.absolutePath}")
             }
         }
-        return new JavaFormatter(formatProperties);
+        return new JavaFormatter(formatProperties)
     }
 
     static FileCollection files(Project project, Object fileSource) {
-        if (fileSource == null && project.getPlugins().hasPlugin(JavaPlugin.class)) {
-            JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-            SourceSet main = javaConvention.getSourceSets().create(SourceSet.MAIN_SOURCE_SET_NAME);
-            SourceSet test = javaConvention.getSourceSets().create(SourceSet.TEST_SOURCE_SET_NAME);
-            fileSource = main.getAllJava().plus(test.getAllJava());
+        if (fileSource == null && project.plugins.hasPlugin(JavaPlugin.class)) {
+            JavaPluginConvention javaConvention = project.convention.getPlugin(JavaPluginConvention.class)
+            SourceSet main = javaConvention.sourceSets.create(SourceSet.MAIN_SOURCE_SET_NAME)
+            SourceSet test = javaConvention.sourceSets.create(SourceSet.TEST_SOURCE_SET_NAME)
+            fileSource = main.allJava.plus(test.allJava)
         }
 
         if (fileSource instanceof Closure) {
-            Closure<?> fileClosure = (Closure<?>) fileSource;
-            fileSource = fileClosure.call();
+            Closure<?> fileClosure = (Closure<?>) fileSource
+            fileSource = fileClosure.call()
         }
         if (fileSource instanceof File) {
-            fileSource = project.files(fileSource.getAbsoluteFile())
+            fileSource = project.files(fileSource.absoluteFile)
         }
 
         if (!(fileSource instanceof FileCollection)) {
             throw new IllegalArgumentException("file collection or closure returning a file collection expected, got " +
-                    (fileSource == null ? "not specified" : fileSource.getClass()));
+                    (fileSource == null ? "not specified" : fileSource.class))
         }
 
-        return (FileCollection) fileSource;
+        return (FileCollection) fileSource
     }
 
     private static void checkValidReadFile(File f) {
         if (!f.exists()) {
-            throw new GradleException("format file " + f.getAbsolutePath() + " does not exists");
+            throw new GradleException("format file ${f.absolutePath} does not exists")
         }
         if (f.isDirectory()) {
-            throw new GradleException("format file " + f.getAbsolutePath() + " is a directory");
+            throw new GradleException("format file ${f.absolutePath} is a directory")
         }
         if (!f.canRead()) {
-            throw new GradleException("format file " + f.getAbsolutePath() + " is not readable");
+            throw new GradleException("format file ${f.absolutePath} is not readable")
         }
     }
 
     private static Properties readPropertyFormat(File f) {
-        Properties properties = new Properties();
+        Properties properties = new Properties()
         try {
-            properties.load(new FileInputStream(f));
+            properties.load(new FileInputStream(f))
         } catch (IOException e) {
-            throw new GradleException("could not read property file " + f.getAbsolutePath(), e);
+            throw new GradleException("could not read property file ${f.absolutePath}", e)
         }
-        return properties;
+        return properties
     }
 
     private static Node getChildElement(String name, NodeList nodes) {
-        Node node;
-        for (int i = 0; i < nodes.getLength(); i++) {
-            node = nodes.item(i);
-            if (node.getNodeName().equals(name)) {
-                break;
+        Node node
+        for (int i = 0; i < nodes.length; i++) {
+            node = nodes.item(i)
+            if (node.nodeName.equals(name)) {
+                break
             }
         }
-        if (node == null) invalidXml("could not found " + name + " tag");
-        return node;
+        if (node == null) invalidXml("could not found ${name} tag")
+        return node
 
     }
 
     private static Properties readXmlFormat(File f) {
-        Properties properties = new Properties();
+        Properties properties = new Properties()
         try {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f);
-            Node profile = getChildElement("profile", getChildElement("profiles", document.getChildNodes()).getChildNodes());
-            NodeList settingNodes = profile.getChildNodes();
-            for (int i = 0; i < settingNodes.getLength(); i++) {
-                Node setting = settingNodes.item(i);
-                if (!setting.getNodeName().equals("setting")) continue;
-                NamedNodeMap attr = setting.getAttributes();
-                Node idAttribute = attr.getNamedItem("id");
-                Node valueAttribute = attr.getNamedItem("value");
-                if (idAttribute == null || valueAttribute == null) invalidXml("missing id or value in setting");
-                properties.put(idAttribute.getNodeValue(), valueAttribute.getNodeValue());
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f)
+            Node profile = getChildElement("profile", getChildElement("profiles", document.childNodes).childNodes)
+            NodeList settingNodes = profile.childNodes
+            for (int i = 0; i < settingNodes.length; i++) {
+                Node setting = settingNodes.item(i)
+                if (!setting.nodeName.equals("setting")) continue
+                NamedNodeMap attr = setting.attributes
+                Node idAttribute = attr.getNamedItem("id")
+                Node valueAttribute = attr.getNamedItem("value")
+                if (idAttribute == null || valueAttribute == null) invalidXml("missing id or value in setting")
+                properties.put(idAttribute.nodeValue, valueAttribute.nodeValue)
             }
         } catch (SAXException e) {
-            throw new GradleException("could not parse " + f.getAbsolutePath(), e);
+            throw new GradleException("could not parse ${f.absolutePath}", e)
         } catch (IOException e) {
-            throw new GradleException("could not read " + f.getAbsolutePath(), e);
+            throw new GradleException("could not read ${f.absolutePath}", e)
         } catch (ParserConfigurationException e) {
-            throw new GradleException("wrong parser configuration " + f.getAbsolutePath(), e);
+            throw new GradleException("wrong parser configuration ${f.absolutePath}", e)
         }
-        return properties;
+        return properties
     }
 
     private static void invalidXml(String message) {
-        String reason = "invalid xml: ";
-        if (message != null) reason += " " + message;
-        throw new GradleException(reason);
+        String reason = "invalid xml: "
+        if (message != null) reason += " " + message
+        throw new GradleException(reason)
     }
 
 
