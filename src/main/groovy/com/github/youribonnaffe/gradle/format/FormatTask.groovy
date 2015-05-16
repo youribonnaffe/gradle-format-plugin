@@ -36,11 +36,11 @@ public class FormatTask extends DefaultTask {
                 public Void call() {
                     try {
                         if (file.exists() && !file.isDirectory() && file.canRead() && file.canWrite()) {
-                            if (format != null) {
-                                format.formatFile(file)
-                            }
                             if (importOrder != null) {
                                 importOrder.updateImports(file)
+                            }
+                            if (format != null) {
+                                format.formatFile(file)
                             }
                             logger.debug(operation + file.absolutePath)
                         } else {

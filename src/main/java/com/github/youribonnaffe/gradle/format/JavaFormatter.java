@@ -38,7 +38,14 @@ public class JavaFormatter {
         String contents = new String(org.eclipse.jdt.internal.compiler.util.Util.getFileCharContent(file, null));
         doc.set(contents);
 
-        TextEdit edit = codeFormatter.format(CodeFormatter.K_COMPILATION_UNIT, contents, 0, contents.length(), 0, null);
+        TextEdit edit = codeFormatter.format(CodeFormatter.K_COMPILATION_UNIT, // format the whole file
+                contents, // source
+                0, // offset
+                contents.length(), //length
+                0, // indentation level
+                System.lineSeparator() // line separator to use
+        );
+
         if (edit != null) {
             edit.apply(doc);
         } else {

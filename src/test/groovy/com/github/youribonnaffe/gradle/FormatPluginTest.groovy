@@ -1,5 +1,4 @@
 package com.github.youribonnaffe.gradle
-
 import com.github.youribonnaffe.gradle.format.FormatTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -48,6 +47,15 @@ class FormatPluginTest {
     }
 
     @Test
+    public void 'format Java 7 code'() {
+        def sourceFile = throwAwayFileCopy("JavaCodeUnformatted_Java7.java")
+        formatTask(formatOptions: throwAwayFileCopy("formatter_java_7.properties"), files: sourceFile).doTask()
+        println(sourceFile.text)
+        println(resourceText("JavaCodeFormatted_Java7.java"))
+        assert sourceFile.text == resourceText("JavaCodeFormatted_Java7.java")
+    }
+
+    @Test
     public void 'format task created'() {
         assert formatTask() != null
     }
@@ -67,7 +75,7 @@ class FormatPluginTest {
         assert sourceFile.text == resourceText("JavaCodeFormatted.java")
     }
 
-    @Test(expected = GradleException)
+    @Test(expected = GradleException.class)
     public void 'load unknown settings'() {
         formatTask(formatOptions: throwAwayFileCopy("formatter.unknown")).doTask()
     }
@@ -81,9 +89,17 @@ class FormatPluginTest {
 
     @Test
     public void 'format Java 8 code'() {
-        def sourceFile = throwAwayFileCopy("JavaCodeUnformatted.java")
+        def sourceFile = throwAwayFileCopy("JavaCodeUnformatted_Java8.java")
         formatTask(formatOptions: throwAwayFileCopy("formatter_java_8.properties"), files: sourceFile).doTask()
-        assert sourceFile.text == resourceText("JavaCodeFormatted.java")
+        assert sourceFile.text == resourceText("JavaCodeFormatted_Java8.java")
+    }
+
+
+    @Test
+    public void 'format enum'() {
+        def sourceFile = throwAwayFileCopy("EnumUnformatted.java")
+        formatTask(formatOptions: throwAwayFileCopy("formatter.properties"), files: sourceFile).doTask()
+        assert sourceFile.text == resourceText("Enum.java")
     }
 
     @Test
