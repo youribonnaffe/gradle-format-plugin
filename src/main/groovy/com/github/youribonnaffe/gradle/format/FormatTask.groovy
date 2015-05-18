@@ -18,11 +18,11 @@ public class FormatTask extends DefaultTask {
         List<Callable<Void>> tasks = new ArrayList<>()
 
         String operationWeDo = ''
+        if (model.importOrder == null && model.formatOptions == null) return
         final ImportSorterAdapter importOrder = FormatInputLoad.importOrder(model.importOrder)
         final JavaFormatter format = FormatInputLoad.format(model.formatOptions)
         if (importOrder != null) operationWeDo += 'importOrder '
         if (format != null) operationWeDo += 'format '
-        if (format == null && importOrder == null) return
         final String operation = operationWeDo
         final LinkedHashMap<String, Exception> errors = new LinkedHashMap<>()
 
