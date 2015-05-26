@@ -5,6 +5,10 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 public class FormatTask extends DefaultTask {
     def FileCollection files = project.sourceSets.main.java + project.sourceSets.test.java
     def File configurationFile
@@ -13,14 +17,8 @@ public class FormatTask extends DefaultTask {
 
     @TaskAction
     void format() {
-        Properties settings = loadSettings()
-        def formatter = new JavaFormatter(settings)
-
-        files.each { file ->
-            logger.info "Formating $file"
-            formatter.formatFile(file)
-        }
-
+        final Properties settings = loadSettings()
+        final formatter = new JavaFormatter(settings)
         def importSorter
         if (importsOrder) {
             importSorter = new ImportSorterAdapter(importsOrder)
@@ -28,11 +26,61 @@ public class FormatTask extends DefaultTask {
         if (importsOrderConfigurationFile) {
             importSorter = new ImportSorterAdapter(importsOrderConfigurationFile.newInputStream())
         }
-        if (importSorter) {
-            files.each { file ->
-                logger.info "Ordering imports for $file"
-                def sortedImportsText = importSorter.sortImports(file.text)
-                file.write(sortedImportsText)
+
+        List<Callable<Void>> formatTasks = new ArrayList<>();
+
+        String operationWeDo = ''
+        if (importSorter != null) operationWeDo += 'importOrder '
+        if (formatter != null) operationWeDo += 'format '
+        if (importSorter == null && formatter == null) return;
+        final String operation = operationWeDo
+        final LinkedHashMap<String, Exception> errors = new LinkedHashMap<>()
+
+        files.each { file ->
+            if (file.exists() && !file.isDirectory() && file.canRead() && file.canWrite()) {
+                formatTasks.add(new Callable<Void>() {
+                    private void error(Exception e) {
+                        errors.put(file.absolutePath, e)
+                    }
+
+                    public void format() {
+                        if (formatter != null) {
+                            formatter.formatFile(file);
+                        }
+                    }
+
+                    public void sortImport() {
+                        if (importSorter != null) {
+                            file.with {
+                                write importSorter.sortImports(file.text)
+                            }
+                        }
+                    }
+
+                    @Override
+                    public Void call() {
+                        try {
+                            format()
+                            sortImport()
+                            logger.debug(operation + file.absolutePath)
+                        } catch (Exception e) {
+                            error(e);
+                        }
+                        return null;
+                    }
+                });
+            } else {
+                errors.put(file.absolutePath, new Exception("could not read or write file"));
+            }
+        }
+        try {
+            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            exec.invokeAll(formatTasks);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("could not finish executing format threads", e);
+        } finally {
+            if (!errors.isEmpty()) {
+                throw new GradleException("FAILED " + operationWeDo + errors.toString());
             }
         }
     }
