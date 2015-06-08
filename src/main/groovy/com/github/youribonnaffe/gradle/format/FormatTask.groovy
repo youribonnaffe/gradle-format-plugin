@@ -6,6 +6,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -27,14 +28,14 @@ public class FormatTask extends DefaultTask {
             importSorter = new ImportSorterAdapter(importsOrderConfigurationFile.newInputStream())
         }
 
-        List<Callable<Void>> formatTasks = new ArrayList<>();
+        List<Callable<Void>> formatTasks = new ArrayList<>()
 
         String operationWeDo = ''
         if (importSorter != null) operationWeDo += 'importOrder '
         if (formatter != null) operationWeDo += 'format '
-        if (importSorter == null && formatter == null) return;
+        if (importSorter == null && formatter == null) return
         final String operation = operationWeDo
-        final LinkedHashMap<String, Exception> errors = new LinkedHashMap<>()
+        final Map<String, Exception> errors = new ConcurrentHashMap<>()
 
         files.each { file ->
             if (file.exists() && !file.isDirectory() && file.canRead() && file.canWrite()) {
@@ -45,7 +46,7 @@ public class FormatTask extends DefaultTask {
 
                     public void format() {
                         if (formatter != null) {
-                            formatter.formatFile(file);
+                            formatter.formatFile(file)
                         }
                     }
 
@@ -60,27 +61,28 @@ public class FormatTask extends DefaultTask {
                     @Override
                     public Void call() {
                         try {
-                            format()
                             sortImport()
+                            format()
                             logger.debug(operation + file.absolutePath)
                         } catch (Exception e) {
-                            error(e);
+                            error(e)
                         }
-                        return null;
+                        return null
                     }
-                });
+                })
             } else {
-                errors.put(file.absolutePath, new Exception("could not read or write file"));
+                errors.put(file.absolutePath, new Exception("could not read or write file"))
             }
         }
         try {
-            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            exec.invokeAll(formatTasks);
+            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+            exec.invokeAll(formatTasks)
         } catch (InterruptedException e) {
-            throw new RuntimeException("could not finish executing format threads", e);
+            throw new GradleException("could not finish executing format threads", e)
         } finally {
             if (!errors.isEmpty()) {
-                throw new GradleException("FAILED " + operationWeDo + errors.toString());
+                Thread.currentThread().interrupt()
+                throw new GradleException("FAILED " + operationWeDo + errors.toString())
             }
         }
     }
@@ -101,13 +103,13 @@ public class FormatTask extends DefaultTask {
     }
 
     private Properties loadPropertiesSettings() {
-        Properties settings = new Properties();
-        settings.load(configurationFile.newInputStream());
+        Properties settings = new Properties()
+        settings.load(configurationFile.newInputStream())
         return settings
     }
 
     private Properties loadXmlSettings() {
-        Properties settings = new Properties();
+        Properties settings = new Properties()
 
         def xmlSettings = new XmlParser().parse(configurationFile)
         xmlSettings.profile.setting.each {
