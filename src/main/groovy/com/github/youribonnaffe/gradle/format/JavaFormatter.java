@@ -43,7 +43,7 @@ public class JavaFormatter {
                 edit.apply(doc);
             } else {
                 System.out.println("====> could not format " + file);
-                return false; // most likely syntax errror
+                return false; // most likely syntax error
             }
 
             // write the file
@@ -59,9 +59,7 @@ public class JavaFormatter {
                 }
             }
             return true;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not format " + file, e);
-        } catch (BadLocationException e) {
+        } catch (IOException | BadLocationException e) {
             throw new RuntimeException("Could not format " + file, e);
         }
     }
