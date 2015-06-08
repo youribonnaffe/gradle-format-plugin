@@ -78,10 +78,10 @@ public class FormatTask extends DefaultTask {
             ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
             exec.invokeAll(formatTasks)
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt()
             throw new GradleException("could not finish executing format threads", e)
         } finally {
             if (!errors.isEmpty()) {
-                Thread.currentThread().interrupt()
                 throw new GradleException("FAILED " + operationWeDo + errors.toString())
             }
         }
