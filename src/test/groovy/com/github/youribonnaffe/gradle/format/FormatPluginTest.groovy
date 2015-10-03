@@ -21,7 +21,7 @@ class FormatPluginTest {
     @Before
     public void createProject() {
         project = ProjectBuilder.builder().build()
-        this.project.apply plugin: 'com.github.youribonnaffe.gradle.format'
+        project.apply plugin: 'com.github.youribonnaffe.gradle.format'
     }
 
     @Test
@@ -155,6 +155,20 @@ class FormatPluginTest {
         task.format()
 
         assert sourceFile.text == getClass().getResourceAsStream("/Enum.java").text
+    }
+
+    @Test
+    public void 'format Android project'() {
+        project.apply plugin: 'android'
+        FormatTask task = project.tasks.format as FormatTask
+
+        def sourceFile = classpathResourceToFile("JavaCodeUnformatted.java")
+        task.configurationFile = classpathResourceToFile("formatter.properties")
+        task.files = project.files(sourceFile)
+
+        task.format()
+
+        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeFormatted.java").text
     }
 
     private File classpathResourceToFile(String filename) {

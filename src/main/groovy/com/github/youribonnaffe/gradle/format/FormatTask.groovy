@@ -3,6 +3,7 @@ package com.github.youribonnaffe.gradle.format
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskAction
 
 import java.util.concurrent.Callable
@@ -11,13 +12,21 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 public class FormatTask extends DefaultTask {
-    def FileCollection files = project.sourceSets.main.java + project.sourceSets.test.java
+    def FileCollection files
     def File configurationFile
     def List<String> importsOrder
     def File importsOrderConfigurationFile
 
     @TaskAction
     void format() {
+        if (files?.isEmpty()) {
+            if (project.plugins.hasPlugin(JavaPlugin)) {
+                files = project.sourceSets.main.java + project.sourceSets.test.java
+            } else if (project.plugins.hasPlugin("android")) {
+                files = project.android.sourceSets.main.java + project.android.sourceSets.test.java
+            }
+        }
+
         final Properties settings = loadSettings()
         final formatter = new JavaFormatter(settings)
         def importSorter
