@@ -17,13 +17,23 @@ public class FormatTask extends DefaultTask {
     def List<String> importsOrder
     def File importsOrderConfigurationFile
 
+    void addFiles(File file, List<File> files) {
+        file.eachFileRecurse {
+            if (it.name =~ /.*\.java/) files.add(it);
+        }
+    }
+
     @TaskAction
     void format() {
-        if (files?.isEmpty()) {
+        if (!files) {
             if (project.plugins.hasPlugin(JavaPlugin)) {
                 files = project.sourceSets.main.java + project.sourceSets.test.java
             } else if (project.plugins.hasPlugin("android")) {
-                files = project.android.sourceSets.main.java + project.android.sourceSets.test.java
+                final ArrayList list = []
+                project.android.sourceSets.main.java.srcDirs.each { folder ->
+                    addFiles(folder, list)
+                }
+                files = project.files(list)
             }
         }
 
