@@ -32,7 +32,7 @@ example on how to get it and use it:
         }
       }
       dependencies {
-        classpath "com.github.youribonnaffe.gradle.format:gradle-format-plugin:1.2"
+        classpath "com.github.youribonnaffe.gradle.format:gradle-format-plugin:1.3"
       }
     }
     
