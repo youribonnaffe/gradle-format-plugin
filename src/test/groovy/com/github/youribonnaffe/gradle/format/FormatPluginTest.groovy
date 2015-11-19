@@ -92,6 +92,19 @@ class FormatPluginTest {
     }
 
     @Test
+    public void 'sort imports on same line'() {
+        FormatTask task = project.tasks.format as FormatTask
+
+        def sourceFile = classpathResourceToFile("JavaCodeUnsortedImportsSameLine.java")
+        task.files = project.files(sourceFile)
+        task.importsOrder = ["java", "javax", "org", "\\#com"]
+
+        task.format()
+
+        assert sourceFile.text == getClass().getResourceAsStream("/JavaCodeSortedImportsSameLine.java").text
+    }
+
+    @Test
     public void 'sort imports reading Eclipse file'() {
         FormatTask task = project.tasks.format as FormatTask
 

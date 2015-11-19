@@ -36,18 +36,23 @@ public class ImportSorterAdapter {
             if (next == null) {
                 break;
             }
-            if (next.startsWith("import ")) {
+            while (next.startsWith("import ")) {
                 int i = next.indexOf(".");
                 if (isNotValidImport(i)) {
-                    continue;
+                    break;
                 }
                 if (firstImportLine == 0) {
                     firstImportLine = line;
                 }
                 lastImportLine = line;
                 int endIndex = next.indexOf(";");
-                imports.add(next.substring(START_INDEX_OF_IMPORTS_PACKAGE_DECLARATION,
-                        endIndex != -1 ? endIndex : next.length()));
+                String importedPackage = next.substring(START_INDEX_OF_IMPORTS_PACKAGE_DECLARATION,
+                        endIndex != -1 ? endIndex : next.length())
+                imports.add(importedPackage);
+                if (endIndex != -1 && endIndex + 1 < next.length())
+                    next = next.substring(endIndex + 1)
+                else
+                    next = ""
             }
         }
 
