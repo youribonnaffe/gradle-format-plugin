@@ -25,18 +25,9 @@ The plugin JAR needs to be accessible in the classpath of your build script. It 
 Alternatively, you can download it from GitHub and deploy it to your local repository. The following code snippet shows an
 example on how to get it and use it:
 
-    buildscript {
-      repositories {
-        maven {
-          url "https://plugins.gradle.org/m2/"
-        }
-      }
-      dependencies {
-        classpath "com.github.youribonnaffe.gradle.format:gradle-format-plugin:1.3"
-      }
+    plugins {
+      id "com.github.youribonnaffe.gradle.format" version "1.4"
     }
-    
-    apply plugin: "com.github.youribonnaffe.gradle.format"
 
 ## Tasks
 
