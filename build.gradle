@@ -17,7 +17,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.eclipse.tycho:org.eclipse.jdt.core:3.10.0.v20140604-1726'
+    compile 'org.eclipse.tycho:org.eclipse.jdt.core:3.11.1.v20150902-1521'
     compile 'org.eclipse.text:org.eclipse.text:3.5.101'
 }
 
