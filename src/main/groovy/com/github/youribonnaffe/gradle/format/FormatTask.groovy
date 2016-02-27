@@ -42,7 +42,8 @@ public class FormatTask extends DefaultTask {
                 formatTasks.add(new Callable<Void>() {
                     private void error(Exception e) {
                         errors.put(file.absolutePath, e)
-                        getLogger().info(file.absolutePath, e)                    }
+                        getLogger().info(file.absolutePath, e)
+                    }
 
                     public void format() {
                         if (formatter != null) {
