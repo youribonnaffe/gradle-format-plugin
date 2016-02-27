@@ -45,7 +45,7 @@ pluginBundle {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion '2.4'
+    gradleVersion '2.11'
     distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
 
