@@ -26,7 +26,7 @@ Alternatively, you can download it from GitHub and deploy it to your local repos
 example on how to get it and use it:
 
     plugins {
-      id "com.github.youribonnaffe.gradle.format" version "1.4"
+      id "com.github.youribonnaffe.gradle.format" version "1.5"
     }
 
 ## Tasks
