@@ -1,3 +1,5 @@
+# Not (actively) maintained anymore, you might want to check out the [Spotless Gradle plugin](https://github.com/diffplug/spotless)
+
 # Gradle Format plugin #
 
 The Gradle Format plugin enables you to format your Java sources. It operates in place and can be used for instance
